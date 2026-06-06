@@ -1,0 +1,483 @@
+package main
+
+import "fmt"
+
+type pasien struct {
+	idPasien, umur int
+	nama, gender   string
+}
+type tabpas [1000]pasien
+
+type Layanan struct {
+	jenisLayanan string
+	hargaLayanan float64
+	idLayanan    int
+}
+type tablay [1000]Layanan
+
+type Kunjungan struct {
+	tanggal     int
+	idLayanan   int
+	idTransaksi int
+	idPasien    int
+	biaya       float64
+}
+type tabKun [1000]Kunjungan
+
+func addPasien(P *tabpas, K *tabKun, L *tablay, np *int, nl int) {
+	var pilihpas, i, inputlay int
+	var ketemu bool = false
+	if *np <= 999 {
+		if nl == 0 {
+			fmt.Println("ID layanan tidak valid, harap isi layanan terebih dahulu")
+		} else {
+			fmt.Print("Nama Pasien: ")
+			fmt.Scan(&P[*np].nama)
+			fmt.Print("Umur Pasien: ")
+			fmt.Scan(&P[*np].umur)
+			fmt.Print("Gender Pasien (L/P): ")
+			fmt.Scan(&P[*np].gender)
+			fmt.Print("Tanggal Kunjungan (YYYYMMDD): ")
+			fmt.Scan(&K[*np].tanggal)
+			for ketemu == false {
+				fmt.Print("ID layanan: ")
+				fmt.Scan(&inputlay)
+				i = 0
+				for i < nl && ketemu == false {
+					if inputlay == L[i].idLayanan {
+						ketemu = true
+						K[*np].biaya = L[i].hargaLayanan
+					}
+					i++
+				}
+				if ketemu == false {
+					fmt.Println("ID layanan tidak valid, harap isi layanan yang ada!")
+				}
+			}
+			P[*np].idPasien = *np + 1
+			K[*np].idPasien = P[*np].idPasien
+			K[*np].idLayanan = inputlay
+			K[*np].idTransaksi = *np + 1000
+			*np = *np + 1
+			fmt.Println("Pasien berhasil di tambahkan")
+		}
+		fmt.Println("Jumlah pasien:", *np)
+		fmt.Println("1. Tambah Pasien")
+		fmt.Println("2. Kembali")
+		fmt.Print("Pilih (angka): ")
+		fmt.Scan(&pilihpas)
+		if pilihpas == 1 {
+			addPasien(P, K, L, np, nl)
+		}
+	} else {
+		fmt.Println("Data pasien sudah penuh!")
+	}
+}
+
+func delPasien(P *tabpas, K *tabKun, np *int) {
+	var i, idpas, j int
+	var ketemu bool
+	i = 0
+	ketemu = false
+	fmt.Print("Masukkan ID pasien yang ingin dihapus: ")
+	fmt.Scan(&idpas)
+	for i < *np {
+		j = i
+		if P[i].idPasien == idpas {
+			ketemu = true
+			for j < *np-1 {
+				K[j] = K[j+1]
+				P[j] = P[j+1]
+				j++
+			}
+			*np = *np - 1
+			i--
+		}
+		i++
+	}
+	if ketemu == true {
+		fmt.Println("Pasien berhasil dihapus")
+	} else {
+		fmt.Println("ID pasien tidak ditemukan")
+	}
+}
+
+func updtPasien(P *tabpas, K *tabKun, L *tablay, np int, nl int) {
+	var i, j, idpas, idlay int
+	var ketemu, ketemuid bool
+	ketemu = false
+	fmt.Println("Masukkan ID pasien yang ingin diubah: ")
+	fmt.Scan(&idpas)
+	for i = 0; i < np; i++ {
+		if P[i].idPasien == idpas {
+			ketemu = true
+			fmt.Println("Masukkan data pasien baru: ")
+			fmt.Print("Nama Pasien: ")
+			fmt.Scan(&P[i].nama)
+			fmt.Print("Umur Pasien: ")
+			fmt.Scan(&P[i].umur)
+			fmt.Print("Gender Pasien (L/P): ")
+			fmt.Scan(&P[i].gender)
+			fmt.Print("Tanggal Kunjungan: ")
+			fmt.Scan(&K[i].tanggal)
+			ketemuid = false
+			for ketemuid == false {
+				fmt.Print("ID Layanan: ")
+				fmt.Scan(&idlay)
+				j = 0
+				for j < nl && ketemuid == false {
+					if L[j].idLayanan == idlay {
+						K[i].idLayanan = idlay
+						K[i].biaya = L[j].hargaLayanan
+						ketemuid = true
+					}
+					j++
+				}
+				if ketemuid == false {
+					fmt.Println("ID layanan tidak valid, harap isi layanan yang ada!")
+				}
+			}
+			fmt.Println("Data pasien berhasil diubah")
+		}
+	}
+	if ketemu == false {
+		fmt.Println("ID pasien tidak ditemukan")
+	}
+}
+
+func addLayanan(L *tablay, nl *int) {
+	var pilihlay int
+	if *nl <= 999 {
+		fmt.Print("Jenis Layanan: ")
+		fmt.Scan(&L[*nl].jenisLayanan)
+		fmt.Print("Harga Layanan: ")
+		fmt.Scan(&L[*nl].hargaLayanan)
+		L[*nl].idLayanan = *nl + 1
+		*nl = *nl + 1
+		fmt.Println("Layanan berhasil di tambahkan")
+		fmt.Println("1. Tambah Layanan")
+		fmt.Println("2. Kembali")
+		fmt.Print("Pilih (angka): ")
+		fmt.Scan(&pilihlay)
+		if pilihlay == 1 {
+			addLayanan(L, nl)
+		}
+	} else {
+		fmt.Println("Data layanan sudah penuh!")
+	}
+}
+
+func delLayanan(L *tablay, nl *int) {
+	var i, j, idlay int
+	var ketemu bool
+	i = 0
+	ketemu = false
+	fmt.Print("Masukkan ID Layanan yang ingin dihapus: ")
+	fmt.Scan(&idlay)
+	for i < *nl {
+		j = i
+		if L[i].idLayanan == idlay {
+			ketemu = true
+			for j < *nl-1 {
+				L[j] = L[j+1]
+				j++
+			}
+			*nl = *nl - 1
+			i--
+		}
+		i++
+	}
+	if ketemu == true {
+		fmt.Println("Layanan berhasil dihapus")
+	} else {
+		fmt.Println("ID layanan tidak ditemukan")
+	}
+}
+
+func updtLayanan(L *tablay, nl int) {
+	var i, idlay int
+	var ketemu bool
+	ketemu = false
+	fmt.Println("Masukkan ID Layanan yang ingin diubah: ")
+	fmt.Scan(&idlay)
+	for i = 0; i < nl; i++ {
+		if L[i].idLayanan == idlay {
+			ketemu = true
+			fmt.Println("Masukkan data layanan baru: ")
+			fmt.Print("Jenis Layanan: ")
+			fmt.Scan(&L[i].jenisLayanan)
+			fmt.Print("Harga Layanan: ")
+			fmt.Scan(&L[i].hargaLayanan)
+			fmt.Println("Data Layanan berhasil diubah")
+		}
+	}
+	if ketemu == false {
+		fmt.Println("ID Layanan tidak ditemukan")
+	}
+}
+
+func uruttanggal(K *tabKun, P *tabpas, np int) {
+	var i, pass int
+	var tempkun Kunjungan
+	var temppas pasien
+	pass = 1
+	for pass <= np-1 {
+		tempkun = K[pass]
+		temppas = P[pass]
+		i = pass
+		for i > 0 && tempkun.tanggal > K[i-1].tanggal {
+			K[i] = K[i-1]
+			P[i] = P[i-1]
+			i--
+		}
+		K[i] = tempkun
+		P[i] = temppas
+		pass++
+	}
+}
+
+func urutbiaya(K *tabKun, P *tabpas, np int) {
+	var pass, i, idx int
+	var tempkun Kunjungan
+	var temppas pasien
+	pass = 1
+	for pass <= np-1 {
+		idx = pass - 1
+		i = pass
+		for i < np {
+			if K[idx].biaya < K[i].biaya {
+				idx = i
+			}
+			i++
+		}
+		tempkun = K[pass-1]
+		temppas = P[pass-1]
+		K[pass-1] = K[idx]
+		P[pass-1] = P[idx]
+		K[idx] = tempkun
+		P[idx] = temppas
+		pass++
+	}
+}
+
+func showPas(P tabpas, L tablay, K tabKun, np, nl, nk int) {
+	var i, j int
+	var namlay string
+	fmt.Println("\n-----------------------------------------------------------------------------------------")
+	fmt.Printf("%-12s %-20s %-20s %-12s %-15s %-12s\n", "ID Pasien", "Nama Pasien", "Layanan", "Tanggal", "Biaya", "ID Transaksi")
+	fmt.Println("-----------------------------------------------------------------------------------------")
+	for i = 0; i < np; i++ {
+		namlay = ""
+		for j = 0; j < nl; j++ {
+			if K[i].idLayanan == L[j].idLayanan {
+				namlay = L[j].jenisLayanan
+			}
+		}
+		fmt.Printf("%-12d%-20s%-20s%-12d%-15.2f%-12d\n", P[i].idPasien, P[i].nama, namlay, K[i].tanggal, K[i].biaya, K[i].idTransaksi)
+	}
+	fmt.Println("-----------------------------------------------------------------------------------------")
+}
+
+func showLay(L tablay, nl int) {
+	var i int
+	fmt.Println("\n--------------------------------------------------")
+	fmt.Printf("%-15s%-25s%-15s\n", "ID LAYANAN", "LAYANAN", "HARGA LAYANAN")
+	fmt.Println("--------------------------------------------------")
+	for i = 0; i < nl; i++ {
+		fmt.Printf("%-15d%-25sRp. %-15.2f\n", L[i].idLayanan, L[i].jenisLayanan, L[i].hargaLayanan)
+	}
+	fmt.Println("--------------------------------------------------")
+}
+
+func menuPasien(P *tabpas, K *tabKun, L *tablay, np *int, nl int) {
+	var pilpas int
+	pilpas = 0
+	var run bool
+	run = true
+	for run {
+		fmt.Println("MENU PASIEN")
+		fmt.Println("1. TAMBAH PASIEN")
+		fmt.Println("2. UBAH PASIEN")
+		fmt.Println("3. HAPUS PASIEN")
+		fmt.Println("4. KEMBALI")
+		fmt.Print("PILIH MENU (angka): ")
+		fmt.Scan(&pilpas)
+
+		if pilpas < 1 || pilpas > 4 {
+			fmt.Println("Harap isi dengan angka 1-4")
+		}
+
+		if pilpas == 1 {
+			addPasien(P, K, L, np, nl)
+		} else if pilpas == 2 {
+			updtPasien(P, K, L, *np, nl)
+		} else if pilpas == 3 {
+			delPasien(P, K, np)
+		} else if pilpas == 4 {
+			run = false
+		} else {
+			fmt.Println("Harap isi dengan angka 1-4")
+		}
+	}
+}
+func menuLayanan(L *tablay, K *tabKun, nl *int) {
+	var pillay int
+	var run bool
+	pillay = 0
+	run = true
+	for run {
+		fmt.Println("MENU LAYANAN")
+		fmt.Println("1. TAMBAH LAYANAN")
+		fmt.Println("2. UBAH LAYANAN")
+		fmt.Println("3. HAPUS LAYANAN")
+		fmt.Println("4. TAMPILKAN LAYANAN")
+		fmt.Println("5. KEMBALI")
+		fmt.Print("PILIH MENU (angka): ")
+		fmt.Scan(&pillay)
+
+		if pillay == 1 {
+			addLayanan(L, nl)
+		} else if pillay == 2 {
+			updtLayanan(L, *nl)
+		} else if pillay == 3 {
+			delLayanan(L, nl)
+		} else if pillay == 4 {
+			showLay(*L, *nl)
+		} else if pillay == 5 {
+			run = false
+		} else {
+			fmt.Println("Harap isi dengan angka 1-5")
+		}
+	}
+}
+
+func searchid(P tabpas, np int) int {
+	var found, mid, left, right, cariid int
+	fmt.Print("Masukkan ID pasien yang ingin dicari: ")
+	fmt.Scan(&cariid)
+	left = 0
+	right = np - 1
+	found = -1
+	for left <= right && found == -1 {
+		mid = (left + right) / 2
+		if cariid > P[mid].idPasien {
+			left = mid + 1
+		} else if cariid < P[mid].idPasien {
+			right = mid - 1
+		} else {
+			found = mid
+		}
+	}
+	return found
+}
+
+func searcnama(P tabpas, np int) int {
+	var ketemu, i int
+	var carinama string
+	fmt.Print("Masukkan nama pasien yang ingin dicari: ")
+	fmt.Scan(&carinama)
+	ketemu = -1
+	i = 0
+	for ketemu == -1 && i < np {
+		if carinama == P[i].nama {
+			ketemu = i
+		}
+		i++
+	}
+	return ketemu
+}
+
+func statistik(K tabKun, L tablay, nk, nl int) {
+	var i, banyaklay, max, j int
+	var layfav string
+	max = 0
+	for i < nl {
+		banyaklay = 0
+		j = 0
+		for j < nk {
+			if K[j].idLayanan == L[i].idLayanan {
+				banyaklay++
+			}
+			j++
+		}
+		if banyaklay > max {
+			max = banyaklay
+			layfav = L[i].jenisLayanan
+		}
+		i++
+	}
+	if max > 0 {
+		fmt.Println("Layanan favorit:", layfav)
+		fmt.Printf("Jumlah kunjungan: %d kunjungan\n", max)
+	} else {
+		fmt.Println("Tidak ada kunjungan.")
+	}
+}
+func main() {
+	var Pasien tabpas
+	var Layanan tablay
+	var Kunjungan tabKun
+	var np, nl, nk int
+	var pilih, pilcari, carinama, cariid int
+	var run bool
+	run = true
+	for run {
+		fmt.Println("MENU UTAMA")
+		fmt.Println("1. PASIEN")
+		fmt.Println("2. LAYANAN")
+		fmt.Println("3. CARI PASIEN")
+		fmt.Println("4. TAMPILKAN SEMUA PASIEN BERDASARKAN BIAYA")
+		fmt.Println("5. TAMPILKAN SEMUA PASIEN BERDASARKAN TANGGAL")
+		fmt.Println("6. STATISTIK")
+		fmt.Println("7. KELUAR")
+		fmt.Print("PILIH MENU (ANGKA): ")
+		fmt.Scan(&pilih)
+
+		if pilih == 1 {
+			menuPasien(&Pasien, &Kunjungan, &Layanan, &np, nl)
+		} else if pilih == 2 {
+			menuLayanan(&Layanan, &Kunjungan, &nl)
+		} else if pilih == 3 {
+			fmt.Println("1. CARI NAMA")
+			fmt.Println("2. CARI ID")
+			fmt.Print("PILIH (angka): ")
+			fmt.Scan(&pilcari)
+			if pilcari == 1 {
+				carinama = searcnama(Pasien, np)
+				if carinama == -1 {
+					fmt.Println("Nama pasien tidak ditemukan")
+				} else {
+					fmt.Println("\n-----------------------------------------------------------------------------------------")
+					fmt.Printf("%-12s %-20s %-20s %-12s %-15s %-12s\n", "ID Pasien", "Nama Pasien", "Layanan", "Tanggal", "Biaya", "ID Transaksi")
+					fmt.Println("-----------------------------------------------------------------------------------------")
+					fmt.Printf("%-12d%-20s%-20s%-12d%-15.2f%-12d\n", Pasien[carinama].idPasien, Pasien[carinama].nama, Layanan[carinama].jenisLayanan, Kunjungan[carinama].tanggal, Kunjungan[carinama].biaya, Kunjungan[carinama].idTransaksi)
+					fmt.Println("-----------------------------------------------------------------------------------------")
+				}
+			} else if pilcari == 2 {
+				cariid = searchid(Pasien, np)
+				if cariid == -1 {
+					fmt.Println("ID pasien tidak ditemukan")
+				} else {
+					fmt.Println("\n-----------------------------------------------------------------------------------------")
+					fmt.Printf("%-12s %-20s %-20s %-12s %-15s %-12s\n", "ID Pasien", "Nama Pasien", "Layanan", "Tanggal", "Biaya", "ID Transaksi")
+					fmt.Println("-----------------------------------------------------------------------------------------")
+					fmt.Printf("%-12d%-20s%-20s%-12d%-15.2f%-12d\n", Pasien[cariid].idPasien, Pasien[cariid].nama, Layanan[cariid].jenisLayanan, Kunjungan[cariid].tanggal, Kunjungan[cariid].biaya, Kunjungan[cariid].idTransaksi)
+					fmt.Println("-----------------------------------------------------------------------------------------")
+				}
+			} else {
+				fmt.Println("Harap isi dengan angka 1-2")
+			}
+		} else if pilih == 4 {
+			urutbiaya(&Kunjungan, &Pasien, np)
+			showPas(Pasien, Layanan, Kunjungan, np, nl, nk)
+		} else if pilih == 5 {
+			uruttanggal(&Kunjungan, &Pasien, np)
+			showPas(Pasien, Layanan, Kunjungan, np, nl, nk)
+		} else if pilih == 6 {
+			statistik(Kunjungan, Layanan, np, nl)
+		} else {
+			fmt.Println("TERIMA KASIH")
+			run = false
+		}
+	}
+}
