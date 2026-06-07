@@ -39,6 +39,13 @@ func addPasien(P *tabpas, K *tabKun, L *tablay, np *int, nl int) {
 			fmt.Scan(&P[*np].gender)
 			fmt.Print("Tanggal Kunjungan (YYYYMMDD): ")
 			fmt.Scan(&K[*np].tanggal)
+			fmt.Println("\n--------------------------------------------------")
+			fmt.Printf("%-15s%-25s%-15s\n", "ID LAYANAN", "LAYANAN", "HARGA LAYANAN")
+			fmt.Println("--------------------------------------------------")
+			for i = 0; i < nl; i++ {
+				fmt.Printf("%-15d %-22s Rp. %-12.2f\n", L[i].idLayanan, L[i].jenisLayanan, L[i].hargaLayanan)
+			}
+			fmt.Println("--------------------------------------------------")
 			for ketemu == false {
 				fmt.Print("ID layanan: ")
 				fmt.Scan(&inputlay)
@@ -57,7 +64,7 @@ func addPasien(P *tabpas, K *tabKun, L *tablay, np *int, nl int) {
 			P[*np].idPasien = *np + 1
 			K[*np].idPasien = P[*np].idPasien
 			K[*np].idLayanan = inputlay
-			K[*np].idTransaksi = *np + 1000
+			K[*np].idTransaksi = *np + 111111111111
 			*np = *np + 1
 			fmt.Println("Pasien berhasil di tambahkan")
 		}
@@ -118,8 +125,15 @@ func updtPasien(P *tabpas, K *tabKun, L *tablay, np int, nl int) {
 			fmt.Scan(&P[i].umur)
 			fmt.Print("Gender Pasien (L/P): ")
 			fmt.Scan(&P[i].gender)
-			fmt.Print("Tanggal Kunjungan: ")
+			fmt.Print("Tanggal Kunjungan (YYYYMMDD): ")
 			fmt.Scan(&K[i].tanggal)
+			fmt.Println("\n--------------------------------------------------")
+			fmt.Printf("%-15s%-25s%-15s\n", "ID LAYANAN", "LAYANAN", "HARGA LAYANAN")
+			fmt.Println("--------------------------------------------------")
+			for i = 0; i < nl; i++ {
+				fmt.Printf("%-15d %-22s Rp. %-12.2f\n", L[i].idLayanan, L[i].jenisLayanan, L[i].hargaLayanan)
+			}
+			fmt.Println("--------------------------------------------------")
 			ketemuid = false
 			for ketemuid == false {
 				fmt.Print("ID Layanan: ")
@@ -152,7 +166,7 @@ func addLayanan(L *tablay, nl *int) {
 		fmt.Scan(&L[*nl].jenisLayanan)
 		fmt.Print("Harga Layanan: ")
 		fmt.Scan(&L[*nl].hargaLayanan)
-		L[*nl].idLayanan = *nl + 1
+		L[*nl].idLayanan = *nl + 50001
 		*nl = *nl + 1
 		fmt.Println("Layanan berhasil di tambahkan")
 		fmt.Println("1. Tambah Layanan")
@@ -264,7 +278,7 @@ func showPas(P tabpas, L tablay, K tabKun, np, nl, nk int) {
 	var i, j int
 	var namlay string
 	fmt.Println("\n-----------------------------------------------------------------------------------------")
-	fmt.Printf("%-12s %-20s %-20s %-12s %-15s %-12s\n", "ID Pasien", "Nama Pasien", "Layanan", "Tanggal", "Biaya", "ID Transaksi")
+	fmt.Printf("%-12s %-20s %-20s %-12s %-15s %-10s\n", "ID Pasien", "Nama Pasien", "Layanan", "Tanggal", "Biaya", "ID Transaksi")
 	fmt.Println("-----------------------------------------------------------------------------------------")
 	for i = 0; i < np; i++ {
 		namlay = ""
@@ -273,7 +287,7 @@ func showPas(P tabpas, L tablay, K tabKun, np, nl, nk int) {
 				namlay = L[j].jenisLayanan
 			}
 		}
-		fmt.Printf("%-12d%-20s%-20s%-12d%-15.2f%-12d\n", P[i].idPasien, P[i].nama, namlay, K[i].tanggal, K[i].biaya, K[i].idTransaksi)
+		fmt.Printf("%-12d %-20s %-20s %-10d %-14.2f %-10d\n", P[i].idPasien, P[i].nama, namlay, K[i].tanggal, K[i].biaya, K[i].idTransaksi)
 	}
 	fmt.Println("-----------------------------------------------------------------------------------------")
 }
@@ -284,7 +298,7 @@ func showLay(L tablay, nl int) {
 	fmt.Printf("%-15s%-25s%-15s\n", "ID LAYANAN", "LAYANAN", "HARGA LAYANAN")
 	fmt.Println("--------------------------------------------------")
 	for i = 0; i < nl; i++ {
-		fmt.Printf("%-15d%-25sRp. %-15.2f\n", L[i].idLayanan, L[i].jenisLayanan, L[i].hargaLayanan)
+		fmt.Printf("%-15d %-22s Rp. %-12.2f\n", L[i].idLayanan, L[i].jenisLayanan, L[i].hargaLayanan)
 	}
 	fmt.Println("--------------------------------------------------")
 }
