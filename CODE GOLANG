@@ -110,7 +110,7 @@ func delPasien(P *tabpas, K *tabKun, np *int) {
 }
 
 func updtPasien(P *tabpas, K *tabKun, L *tablay, np int, nl int) {
-	var i, j, idpas, idlay int
+	var i, j, k, idpas, idlay int
 	var ketemu, ketemuid bool
 	ketemu = false
 	fmt.Println("Masukkan ID pasien yang ingin diubah: ")
@@ -130,8 +130,8 @@ func updtPasien(P *tabpas, K *tabKun, L *tablay, np int, nl int) {
 			fmt.Println("\n--------------------------------------------------")
 			fmt.Printf("%-15s%-25s%-15s\n", "ID LAYANAN", "LAYANAN", "HARGA LAYANAN")
 			fmt.Println("--------------------------------------------------")
-			for i = 0; i < nl; i++ {
-				fmt.Printf("%-15d %-22s Rp. %-12.2f\n", L[i].idLayanan, L[i].jenisLayanan, L[i].hargaLayanan)
+			for k = 0; k < nl; k++ {
+				fmt.Printf("%-15d %-22s Rp. %-12.2f\n", L[k].idLayanan, L[k].jenisLayanan, L[k].hargaLayanan)
 			}
 			fmt.Println("--------------------------------------------------")
 			ketemuid = false
@@ -181,8 +181,8 @@ func addLayanan(L *tablay, nl *int) {
 	}
 }
 
-func delLayanan(L *tablay, nl *int) {
-	var i, j, idlay int
+func delLayanan(L *tablay, K *tabKun, nl *int, np int) {
+	var i, j, k, idlay int
 	var ketemu bool
 	i = 0
 	ketemu = false
@@ -198,6 +198,12 @@ func delLayanan(L *tablay, nl *int) {
 			}
 			*nl = *nl - 1
 			i--
+			for k = 0; k < np; k++ {
+				if K[k].idLayanan == idlay {
+					K[k].idLayanan = -1
+					K[k].biaya = 0
+				}
+			}
 		}
 		i++
 	}
@@ -274,20 +280,20 @@ func urutbiaya(K *tabKun, P *tabpas, np int) {
 	}
 }
 
-func showPas(P tabpas, L tablay, K tabKun, np, nl, nk int) {
+func showPas(P tabpas, L tablay, K tabKun, np, nl int) {
 	var i, j int
 	var namlay string
 	fmt.Println("\n-----------------------------------------------------------------------------------------")
 	fmt.Printf("%-12s %-20s %-20s %-12s %-15s %-10s\n", "ID Pasien", "Nama Pasien", "Layanan", "Tanggal", "Biaya", "ID Transaksi")
 	fmt.Println("-----------------------------------------------------------------------------------------")
 	for i = 0; i < np; i++ {
-		namlay = ""
+		namlay = "[LAYANAN DINONAKTIFKAN]"
 		for j = 0; j < nl; j++ {
 			if K[i].idLayanan == L[j].idLayanan {
 				namlay = L[j].jenisLayanan
 			}
 		}
-		fmt.Printf("%-12d %-20s %-20s %-10d %-14.2f %-10d\n", P[i].idPasien, P[i].nama, namlay, K[i].tanggal, K[i].biaya, K[i].idTransaksi)
+		fmt.Printf("%-12d %-20s %-20s %-10d %-12.2f %-10d\n", P[i].idPasien, P[i].nama, namlay, K[i].tanggal, K[i].biaya, K[i].idTransaksi)
 	}
 	fmt.Println("-----------------------------------------------------------------------------------------")
 }
@@ -334,7 +340,7 @@ func menuPasien(P *tabpas, K *tabKun, L *tablay, np *int, nl int) {
 		}
 	}
 }
-func menuLayanan(L *tablay, K *tabKun, nl *int) {
+func menuLayanan(L *tablay, K *tabKun, nl *int, np *int) {
 	var pillay int
 	var run bool
 	pillay = 0
@@ -354,7 +360,7 @@ func menuLayanan(L *tablay, K *tabKun, nl *int) {
 		} else if pillay == 2 {
 			updtLayanan(L, *nl)
 		} else if pillay == 3 {
-			delLayanan(L, nl)
+			delLayanan(L, K, nl, *np)
 		} else if pillay == 4 {
 			showLay(*L, *nl)
 		} else if pillay == 5 {
@@ -402,38 +408,70 @@ func searcnama(P tabpas, np int) int {
 }
 
 func statistik(K tabKun, L tablay, nk, nl int) {
-	var i, banyaklay, max, j int
-	var layfav string
+	var i, banyaklay, banyakkun, max, j, caritgl int
+	var layfav, layfavall string
+	var banyaklayall, maxall, k, l int
 	max = 0
-	for i < nl {
+	banyakkun = 0
+	banyaklay = 0
+	maxall = 0
+	banyaklayall = 0
+	for k = 0; k < nl; k++ {
+		banyaklayall = 0
+		for l = 0; l < nk; l++ {
+			if K[l].idLayanan == L[k].idLayanan {
+				banyaklayall++
+			}
+		}
+		if banyaklayall > maxall {
+			maxall = banyaklayall
+			layfavall = L[k].jenisLayanan
+		}
+	}
+	fmt.Println("\n------------------------------------------------")
+	fmt.Println("STATISTIK KLINIK ALLTIME")
+	fmt.Println("------------------------------------------------")
+	fmt.Printf("Jumlah kunjungan alltime: %d kunjungan\n", nk)
+	fmt.Println("Layanan favorit alltime :", layfavall)
+	fmt.Println("------------------------------------------------")
+	fmt.Println("Masukkan tanggal kunjungan (YYYYMMDD): ")
+	fmt.Scan(&caritgl)
+	for i = 0; i < nk; i++ {
+		if K[i].tanggal == caritgl {
+			banyakkun++
+		}
+	}
+	for i = 0; i < nl; i++ {
 		banyaklay = 0
-		j = 0
-		for j < nk {
-			if K[j].idLayanan == L[i].idLayanan {
+		for j = 0; j < nk; j++ {
+			if K[j].idLayanan == L[i].idLayanan && K[j].tanggal == caritgl {
 				banyaklay++
 			}
-			j++
 		}
 		if banyaklay > max {
 			max = banyaklay
 			layfav = L[i].jenisLayanan
 		}
-		i++
 	}
 	if max > 0 {
-		fmt.Println("Layanan favorit:", layfav)
-		fmt.Printf("Jumlah kunjungan: %d kunjungan\n", max)
+		fmt.Println("\n------------------------------------------------")
+		fmt.Printf("STATISTIK HARIAN KLINIK TANGGAL: %d \n", caritgl)
+		fmt.Println("------------------------------------------------")
+		fmt.Printf("Jumlah kunjungan: %d kunjungan\n", banyakkun)
+		fmt.Println("Layanan favorit :", layfav)
+		fmt.Println("------------------------------------------------")
 	} else {
-		fmt.Println("Tidak ada kunjungan.")
+		fmt.Printf("Tidak ada kunjungan pada tanggal: %d.\n", caritgl)
 	}
 }
 func main() {
 	var Pasien tabpas
 	var Layanan tablay
 	var Kunjungan tabKun
-	var np, nl, nk int
+	var np, nl, i int
 	var pilih, pilcari, carinama, cariid int
 	var run bool
+	var namlaynm, namlayid string
 	run = true
 	for run {
 		fmt.Println("MENU UTAMA")
@@ -450,7 +488,7 @@ func main() {
 		if pilih == 1 {
 			menuPasien(&Pasien, &Kunjungan, &Layanan, &np, nl)
 		} else if pilih == 2 {
-			menuLayanan(&Layanan, &Kunjungan, &nl)
+			menuLayanan(&Layanan, &Kunjungan, &nl, &np)
 		} else if pilih == 3 {
 			fmt.Println("1. CARI NAMA")
 			fmt.Println("2. CARI ID")
@@ -461,10 +499,16 @@ func main() {
 				if carinama == -1 {
 					fmt.Println("Nama pasien tidak ditemukan")
 				} else {
+					namlaynm = "[LAYANAN DINONAKTIFKAN]"
+					for i = 0; i < nl; i++ {
+						if Kunjungan[carinama].idLayanan == Layanan[i].idLayanan {
+							namlaynm = Layanan[i].jenisLayanan
+						}
+					}
 					fmt.Println("\n-----------------------------------------------------------------------------------------")
 					fmt.Printf("%-12s %-20s %-20s %-12s %-15s %-12s\n", "ID Pasien", "Nama Pasien", "Layanan", "Tanggal", "Biaya", "ID Transaksi")
 					fmt.Println("-----------------------------------------------------------------------------------------")
-					fmt.Printf("%-12d%-20s%-20s%-12d%-15.2f%-12d\n", Pasien[carinama].idPasien, Pasien[carinama].nama, Layanan[carinama].jenisLayanan, Kunjungan[carinama].tanggal, Kunjungan[carinama].biaya, Kunjungan[carinama].idTransaksi)
+					fmt.Printf("%-12d%-20s%-20s%-12d Rp.%-12.2f%-12d\n", Pasien[carinama].idPasien, Pasien[carinama].nama, namlaynm, Kunjungan[carinama].tanggal, Kunjungan[carinama].biaya, Kunjungan[carinama].idTransaksi)
 					fmt.Println("-----------------------------------------------------------------------------------------")
 				}
 			} else if pilcari == 2 {
@@ -472,10 +516,16 @@ func main() {
 				if cariid == -1 {
 					fmt.Println("ID pasien tidak ditemukan")
 				} else {
+					namlayid = "[LAYANAN DINONAKTIFKAN]"
+					for i = 0; i < nl; i++ {
+						if Kunjungan[cariid].idLayanan == Layanan[i].idLayanan {
+							namlayid = Layanan[i].jenisLayanan
+						}
+					}
 					fmt.Println("\n-----------------------------------------------------------------------------------------")
 					fmt.Printf("%-12s %-20s %-20s %-12s %-15s %-12s\n", "ID Pasien", "Nama Pasien", "Layanan", "Tanggal", "Biaya", "ID Transaksi")
 					fmt.Println("-----------------------------------------------------------------------------------------")
-					fmt.Printf("%-12d%-20s%-20s%-12d%-15.2f%-12d\n", Pasien[cariid].idPasien, Pasien[cariid].nama, Layanan[cariid].jenisLayanan, Kunjungan[cariid].tanggal, Kunjungan[cariid].biaya, Kunjungan[cariid].idTransaksi)
+					fmt.Printf("%-12d%-20s%-20s%-12d Rp.%-12.2f%-12d\n", Pasien[cariid].idPasien, Pasien[cariid].nama, namlayid, Kunjungan[cariid].tanggal, Kunjungan[cariid].biaya, Kunjungan[cariid].idTransaksi)
 					fmt.Println("-----------------------------------------------------------------------------------------")
 				}
 			} else {
@@ -483,10 +533,10 @@ func main() {
 			}
 		} else if pilih == 4 {
 			urutbiaya(&Kunjungan, &Pasien, np)
-			showPas(Pasien, Layanan, Kunjungan, np, nl, nk)
+			showPas(Pasien, Layanan, Kunjungan, np, nl)
 		} else if pilih == 5 {
 			uruttanggal(&Kunjungan, &Pasien, np)
-			showPas(Pasien, Layanan, Kunjungan, np, nl, nk)
+			showPas(Pasien, Layanan, Kunjungan, np, nl)
 		} else if pilih == 6 {
 			statistik(Kunjungan, Layanan, np, nl)
 		} else {
