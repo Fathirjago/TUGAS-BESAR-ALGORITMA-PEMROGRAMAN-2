@@ -37,7 +37,7 @@ func addkomponen(T *tabpc, S *tabsensor, nk *int) {
 		fmt.Scan(&S[*nk].suhu)
 		fmt.Print("Beban komponen (%): ")
 		fmt.Scan(&S[*nk].beban)
-		if S[*nk].suhu > 100 && S[*nk].beban > 100 {
+		if S[*nk].suhu > 100 && S[*nk].beban > 100 { //cek suhu
 			T[*nk].status = "Blue_Screen"
 		} else if S[*nk].suhu > 85 {
 			T[*nk].status = "Overheat"
@@ -46,7 +46,7 @@ func addkomponen(T *tabpc, S *tabsensor, nk *int) {
 		} else {
 			T[*nk].status = "Normal"
 		}
-		T[*nk].idkomponen = *nk + 1
+		T[*nk].idkomponen = *nk + 1 //idkomponen bertambah 1 setiap data ditambah dan idkomponen dimulai dari 1
 		S[*nk].idkomponen = T[*nk].idkomponen
 		*nk++
 		fmt.Println("Komponen berhasil ditambahkan")
@@ -78,7 +78,7 @@ func updtkomponen(T *tabpc, S *tabsensor, nk int) {
 	fmt.Scan(&carikomoponen)
 	if carikomoponen != 0 {
 		for i = 0; i < nk; i++ {
-			if T[i].idkomponen == carikomoponen {
+			if T[i].idkomponen == carikomoponen { //mencari idkomponen yang ingin dicari
 				ketemu = true
 				fmt.Print("Nama komponen: ")
 				fmt.Scan(&T[i].nama)
@@ -114,7 +114,7 @@ func updtkomponen(T *tabpc, S *tabsensor, nk int) {
 						fmt.Scan(&pilihan)
 					}
 				}
-				if S[i].suhu > 100 && S[i].beban > 100 {
+				if S[i].suhu > 100 && S[i].beban > 100 { //cek suhu
 					T[i].status = "Blue_Screen"
 				} else if S[i].suhu > 85 {
 					T[i].status = "Overheat"
@@ -125,7 +125,7 @@ func updtkomponen(T *tabpc, S *tabsensor, nk int) {
 				}
 			}
 		}
-		if ketemu == false {
+		if ketemu == false { // ketika idkomponen yang ingin dicaari tidak ditemukan
 			fmt.Println("ID komponen tidak ditemukan")
 			updtkomponen(T, S, nk)
 		}
@@ -145,7 +145,7 @@ func delkomponen(T *tabpc, S *tabsensor, nk *int) {
 				ketemu = true
 				j = i
 				for j < *nk-1 {
-					T[j] = T[j+1]
+					T[j] = T[j+1] //geser nilainya ke kiri
 					S[j] = S[j+1]
 					j++
 				}
@@ -179,19 +179,16 @@ func statuskomponen(T *tabpc, S *tabsensor, nk int) {
 	}
 	fmt.Println("-------------------------------------------------------------------------------------")
 }
-func searchname(T *tabpc, S *tabsensor, nk int) int {
-	var mid, left, right, pass, i int
-	var carinama string
+func sortName(T *tabpc, S *tabsensor, nk int) { //sorting untuk binary (insertion)
 	var temppc komponen
 	var tempsen sensor
-	fmt.Println("===CARI KOMPONEN BERDASARKAN NAMA===")
-	fmt.Println("Data telah di sorting")
+	var pass, i int
 	pass = 1
 	for pass < nk {
 		temppc = T[pass]
 		tempsen = S[pass]
 		i = pass
-		for i > 0 && temppc.nama < T[i-1].nama {
+		for i > 0 && temppc.nama < T[i-1].nama { //ascending
 			T[i] = T[i-1]
 			S[i] = S[i-1]
 			i--
@@ -200,6 +197,12 @@ func searchname(T *tabpc, S *tabsensor, nk int) int {
 		S[i] = tempsen
 		pass++
 	}
+}
+func searchname(T tabpc, S tabsensor, nk int) int { //binary
+	var mid, left, right int
+	var carinama string
+	fmt.Println("===CARI KOMPONEN BERDASARKAN NAMA===")
+	fmt.Println("Data telah di sorting")
 	fmt.Println("Masukkan nama komponen yang ingin dicari: ")
 	fmt.Scan(&carinama)
 	left = 0
@@ -216,7 +219,7 @@ func searchname(T *tabpc, S *tabsensor, nk int) int {
 	}
 	return -1
 }
-func searchstatus(T *tabpc, S *tabsensor, nk int) {
+func searchstatus(T tabpc, S tabsensor, nk int) { //sequential
 	var ketemu bool
 	var caristatus string
 	var i int
@@ -241,7 +244,7 @@ func searchstatus(T *tabpc, S *tabsensor, nk int) {
 		fmt.Println("-------------------------------------------------------------------------------------")
 	}
 }
-func sortingnoseridesc(T *tabpc, S *tabsensor, nk int) {
+func sortingnoseridesc(T *tabpc, S *tabsensor, nk int) { //selection
 	var pass, idx, i int
 	var temppc komponen
 	var tempsen sensor
@@ -250,7 +253,7 @@ func sortingnoseridesc(T *tabpc, S *tabsensor, nk int) {
 		idx = pass - 1
 		i = pass
 		for i < nk {
-			if T[idx].noseri < T[i].noseri {
+			if T[idx].noseri < T[i].noseri { //descending
 				idx = i
 			}
 			i++
@@ -264,7 +267,7 @@ func sortingnoseridesc(T *tabpc, S *tabsensor, nk int) {
 		pass++
 	}
 }
-func sortingnoseriasc(T *tabpc, S *tabsensor, nk int) {
+func sortingnoseriasc(T *tabpc, S *tabsensor, nk int) { //insertion
 	var i, pass int
 	var temppc komponen
 	var tempsen sensor
@@ -273,7 +276,7 @@ func sortingnoseriasc(T *tabpc, S *tabsensor, nk int) {
 		temppc = T[pass]
 		tempsen = S[pass]
 		i = pass
-		for i > 0 && temppc.noseri < T[i-1].noseri {
+		for i > 0 && temppc.noseri < T[i-1].noseri { //ascending
 			T[i] = T[i-1]
 			S[i] = S[i-1]
 			i--
@@ -371,7 +374,8 @@ func main() {
 			fmt.Println("PILIH MENU (1-2): ")
 			fmt.Scan(&pilihpencarian)
 			if pilihpencarian == 1 {
-				Nnama = searchname(&T, &S, nk)
+				sortName(&T, &S, nk)
+				Nnama = searchname(T, S, nk)
 				if Nnama == -1 {
 					fmt.Println("Nama tidak ditemukan")
 				} else {
@@ -382,7 +386,7 @@ func main() {
 					fmt.Println("-------------------------------------------------------------------------------------")
 				}
 			} else if pilihpencarian == 2 {
-				searchstatus(&T, &S, nk)
+				searchstatus(T, S, nk)
 			} else {
 				fmt.Println("Pilihan tidak valid, silakan pilih menu yang tersedia")
 			}
