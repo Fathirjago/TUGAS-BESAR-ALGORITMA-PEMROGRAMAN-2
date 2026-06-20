@@ -212,9 +212,9 @@ func searchname(T tabpc, S tabsensor, nk int) int { //binary
 		if T[mid].nama == carinama {
 			return mid
 		} else if T[mid].nama > carinama {
-			left = mid + 1
-		} else {
 			right = mid - 1
+		} else {
+			left = mid + 1
 		}
 	}
 	return -1
